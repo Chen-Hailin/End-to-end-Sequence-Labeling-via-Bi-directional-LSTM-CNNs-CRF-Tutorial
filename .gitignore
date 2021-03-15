@@ -1,4 +1,4 @@
 .ipynb_checkpoints/*
-data/glove.6B.100d.txt
+data/*
 !.gitignore
 

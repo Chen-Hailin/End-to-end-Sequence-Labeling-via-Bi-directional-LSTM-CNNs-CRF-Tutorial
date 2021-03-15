@@ -319,7 +319,11 @@ def get_model_features(self, sentence, chars2, chars2_length, d):
 		model_out = self.dropout(lstm_out)
 
 	elif self.model_mode == 'CNN':
-		cnn_out = self.cnn(embeds.permute([1, 2, 0]))
+		for i, cnn_layer in enumerate(self.cnn):
+			if i == 0:
+				cnn_out = cnn_layer(embeds.permute([1, 2, 0]))
+			else:
+				cnn_out = cnn_layer(cnn_out)
 		model_out = cnn_out.squeeze(0).permute([1,0])
 
 	## Linear layer converts the ouput vectors to tag space
@@ -417,14 +421,22 @@ class Model_CRF(nn.Module):
 			#Initializing the lstm layer using predefined function for initialization
 			init_lstm(self.lstm)
 		elif self.model_mode == 'CNN':
-			kernel_size = parameters['CNN_params']['kernel_size']
-			dilation = parameters['CNN_params']['dilation']
-			padding = dilation * kernel_size // 2  
-			if self.char_mode == 'LSTM':
-				self.cnn = nn.Conv1d(embedding_dim+self.char_lstm_dim*2, hidden_dim*2, kernel_size=kernel_size, padding=padding, dilation=dilation)
-			if self.char_mode == 'CNN':
-				self.cnn = nn.Conv1d(embedding_dim+self.out_channels, hidden_dim*2, kernel_size=kernel_size, padding=padding, dilation=dilation)
-		
+			n_layers = parameters['CNN_params']['n_layers']
+			self.cnn = []
+			for i in range(n_layers):
+				kernel_size = parameters['CNN_params']['kernel_size'][i]
+				dilation = parameters['CNN_params']['dilation'][i]
+				padding = dilation * (kernel_size // 2)  
+				if self.char_mode == 'LSTM' and i == 0:
+					input_dim = embedding_dim+self.char_lstm_dim*2
+					output_dim = hidden_dim*2
+				elif self.char_mode == 'CNN' and i == 0:
+					input_dim = embedding_dim+self.out_channels
+					output_dim = hidden_dim*2
+				else:
+					input_dim, output_dim = hidden_dim*2, hidden_dim*2
+				self.cnn += [nn.Conv1d(input_dim, output_dim, kernel_size=kernel_size, padding=padding, dilation=dilation)]
+			
 		
 		# Linear layer which maps the output of the bidirectional LSTM into tag space.
 		self.hidden2tag = nn.Linear(hidden_dim*2, self.tagset_size)

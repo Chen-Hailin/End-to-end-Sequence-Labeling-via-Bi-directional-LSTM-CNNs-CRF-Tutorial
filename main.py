@@ -169,6 +169,7 @@ if not parameters['reload']:
 	print(time.time() - tr)
 	plt.plot(losses)
 	plt.show()
+	plt.savefig(f"{parameters['name']}.png")
 
 if not parameters['reload']:
 	#reload the best model saved from training

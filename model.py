@@ -263,7 +263,6 @@ def forward_calc(self, sentence, chars, chars2_length, d):
 def get_model_features(self, sentence, chars2, chars2_length, d):
 	
 	if self.char_mode == 'LSTM':
-		
 			chars_embeds = self.char_embeds(chars2).transpose(0, 1)
 			
 			packed = torch.nn.utils.rnn.pack_padded_sequence(chars_embeds, chars2_length)
@@ -374,8 +373,10 @@ class Model_CRF(nn.Module):
 		self.use_crf = use_crf
 		self.tagset_size = len(tag_to_ix)
 		self.out_channels = char_out_dimension
+		self.char_lstm_dim = char_out_dimension
 		self.char_mode = char_mode
 		self.model_mode = model_mode
+
 
 		if char_embedding_dim is not None:
 			self.char_embedding_dim = char_embedding_dim
@@ -386,7 +387,7 @@ class Model_CRF(nn.Module):
 			
 			#Performing LSTM encoding on the character embeddings
 			if self.char_mode == 'LSTM':
-				self.char_lstm = nn.LSTM(char_embedding_dim, char_lstm_dim, num_layers=1, bidirectional=True)
+				self.char_lstm = nn.LSTM(char_embedding_dim, self.char_lstm_dim, num_layers=1, bidirectional=True)
 				init_lstm(self.char_lstm)
 				
 			#Performing CNN encoding on the character embeddings
@@ -410,7 +411,7 @@ class Model_CRF(nn.Module):
 		#bidirectional=True, specifies that we are using the bidirectional LSTM
 		if self.model_mode == 'LSTM':
 			if self.char_mode == 'LSTM':
-				self.lstm = nn.LSTM(embedding_dim+char_lstm_dim*2, hidden_dim, bidirectional=True)
+				self.lstm = nn.LSTM(embedding_dim+self.char_lstm_dim*2, hidden_dim, bidirectional=True)
 			if self.char_mode == 'CNN':
 				self.lstm = nn.LSTM(embedding_dim+self.out_channels, hidden_dim, bidirectional=True)
 			#Initializing the lstm layer using predefined function for initialization
@@ -420,7 +421,7 @@ class Model_CRF(nn.Module):
 			dilation = parameters['CNN_params']['dilation']
 			padding = dilation * kernel_size // 2  
 			if self.char_mode == 'LSTM':
-				self.cnn = nn.Conv1d(embedding_dim+char_lstm_dim*2, hidden_dim, kernel_size=kernel_size, padding=padding, dilation=dilation)
+				self.cnn = nn.Conv1d(embedding_dim+self.char_lstm_dim*2, hidden_dim*2, kernel_size=kernel_size, padding=padding, dilation=dilation)
 			if self.char_mode == 'CNN':
 				self.cnn = nn.Conv1d(embedding_dim+self.out_channels, hidden_dim*2, kernel_size=kernel_size, padding=padding, dilation=dilation)
 		

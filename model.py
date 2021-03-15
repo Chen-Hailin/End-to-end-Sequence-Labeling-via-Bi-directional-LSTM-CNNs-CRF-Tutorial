@@ -423,7 +423,7 @@ class Model_CRF(nn.Module):
 			init_lstm(self.lstm)
 		elif self.model_mode == 'CNN':
 			n_layers = parameters['CNN_params']['n_layers']
-			self.cnn = []
+			self.cnn = nn.ModuleList([])
 			for i in range(n_layers):
 				kernel_size = parameters['CNN_params']['kernel_size'][i]
 				dilation = parameters['CNN_params']['dilation'][i]
@@ -436,7 +436,7 @@ class Model_CRF(nn.Module):
 					output_dim = hidden_dim*2
 				else:
 					input_dim, output_dim = hidden_dim*2, hidden_dim*2
-				self.cnn += [nn.Conv1d(input_dim, output_dim, kernel_size=kernel_size, padding=padding, dilation=dilation)]
+				self.cnn.append(nn.Conv1d(input_dim, output_dim, kernel_size=kernel_size, padding=padding, dilation=dilation)
 			
 		
 		# Linear layer which maps the output of the bidirectional LSTM into tag space.

@@ -34,7 +34,7 @@ char_to_id = mappings['char_to_id']
 word_embeds = mappings['word_embeds']
 
 #creating the model using the Class defined above
-model = BiLSTM_CRF(vocab_size=len(word_to_id),
+model = Model_CRF(vocab_size=len(word_to_id),
                    tag_to_ix=tag_to_id,
                    embedding_dim=parameters['word_dim'],
                    hidden_dim=parameters['word_lstm_dim'],

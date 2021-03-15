@@ -5,6 +5,7 @@ import torch.nn as nn
 from torch.nn import init
 from torch.autograd import Variable
 from torch import autograd
+import torch.nn.functional as F
 
 import time
 import _pickle as cPickle
@@ -321,9 +322,9 @@ def get_model_features(self, sentence, chars2, chars2_length, d):
 	elif self.model_mode == 'CNN':
 		for i, cnn_layer in enumerate(self.cnn):
 			if i == 0:
-				cnn_out = cnn_layer(embeds.permute([1, 2, 0]))
+				cnn_out = F.relu(cnn_layer(embeds.permute([1, 2, 0])))
 			else:
-				cnn_out = cnn_layer(cnn_out)
+				cnn_out = F.relu(cnn_layer(cnn_out))
 		model_out = cnn_out.squeeze(0).permute([1,0])
 
 	## Linear layer converts the ouput vectors to tag space

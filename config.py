@@ -18,11 +18,11 @@ parameters['crf'] =1 #Use CRF (0 to disable)
 parameters['dropout'] = 0.5 #Droupout on the input (0 = no dropout)
 parameters['epoch'] =  50 #Number of epochs to run"
 parameters['weights'] = "" #path to Pretrained for from a previous run
-parameters['name'] = "self-trained-CNN_CNN1" # Model name
+parameters['name'] = "self-trained-relu-CNN_CNN1" # Model name
 parameters['gradient_clip']=5.0
 parameters['char_mode']="CNN"
 parameters['model_mode']="CNN" #  [LSTM, CNN]
-parameters['CNN_params'] = {'kernel_size':3, 'dilation': 1}
+parameters['CNN_params'] = {'kernel_size':[3,3,3], 'dilation': [1,2,3], 'n_layers':1}
 models_path = "./models/" #path to saved models
 
 #GPU

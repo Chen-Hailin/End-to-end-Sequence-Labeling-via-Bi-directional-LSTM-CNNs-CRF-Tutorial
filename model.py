@@ -257,7 +257,7 @@ def forward_calc(self, sentence, chars, chars2_length, d):
 		score, tag_seq = self.viterbi_decode(feats)
 	else:
 		score, tag_seq = torch.max(feats, 1)
-		tag_seq = list(tag_seq.cpu().data)
+		tag_seq = tag_seq.cpu().data.tolist()
 
 	return score, tag_seq
 

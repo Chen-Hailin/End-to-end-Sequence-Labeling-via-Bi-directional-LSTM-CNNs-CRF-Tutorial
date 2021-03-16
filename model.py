@@ -329,8 +329,6 @@ def get_model_features(self, sentence, chars2, chars2_length, d):
 
 	## Linear layer converts the ouput vectors to tag space
 	model_feats = self.hidden2tag(model_out)
-	if not self.use_crf:
-		model_feats = F.softmax(model_feats)
 	return model_feats
 
 def get_neg_log_likelihood(self, sentence, tags, chars2, chars2_length, d):
@@ -345,6 +343,7 @@ def get_neg_log_likelihood(self, sentence, tags, chars2, chars2_length, d):
 	else:
 		tags = Variable(tags)
 		scores = nn.functional.cross_entropy(feats, tags)
+
 		return scores
 
 class Model_CRF(nn.Module):

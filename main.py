@@ -46,6 +46,10 @@ model = Model_CRF(vocab_size=len(word_to_id),
 				   char_mode=parameters['char_mode'],
 				   model_mode=parameters['model_mode'])
 print("Model Initialized!!!")
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+print(f'Number of parameters: {count_parameters(model)}')
+
 #Reload a saved model, if parameter["reload"] is set to a path
 if parameters['reload']:
 	if not os.path.exists(parameters['reload']):
